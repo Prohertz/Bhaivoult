@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BHAI'S SECRET HACKER VAULT V8 - WEB</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#00ff41;font-family:'Courier New',monospace}
+canvas{position:fixed;inset:0;z-index:0;opacity:.35}
+.screen{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
+.hidden{display:none!important}
+.term{width:min(720px,96vw);background:rgba(0,20,0,.92);border:2px solid #00ff41;box-shadow:0 0 35px #00ff41;padding:20px;border-radius:12px;min-height:380px}
+.bar{height:16px;border:1px solid #00ff41;margin-top:16px}.fill{height:100%;background:#00ff41;width:0%;transition:.2s}
+.box{width:min(440px,96vw);background:#020a02;border:2px solid #00ff41;border-radius:18px;padding:26px;text-align:center;box-shadow:0 0 45px rgba(0,255,65,.45)}
+input,select,textarea{width:100%;padding:13px;background:#000;border:1px solid #00ff41;color:#00ff41;font-size:15px;border-radius:8px;outline:none;margin:8px 0}
+button{width:100%;padding:13px;background:#00ff41;color:#000;font-weight:900;border:none;border-radius:8px;cursor:pointer;font-size:15px;margin-top:8px}
+.ghost{background:transparent!important;color:#00ff41!important;border:1px solid #00ff41}
+.vault{width:min(1020px,97vw);margin:0 auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:13px;margin-top:16px}
+.card{background:#041204;border:1px solid #00ff41;border-radius:14px;padding:15px;cursor:pointer;position:relative;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 0 20px rgba(0,255,65,.4)}
+.card b{display:block;margin-top:8px;color:#fff;word-break:break-word}.card small{color:#9dffb5}
+.chip{font-size:11px;border:1px solid #00ff41;padding:2px 7px;border-radius:20px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}
+.modalBox{width:min(480px,96vw);background:#020a02;border:2px solid #00ff41;border-radius:16px;padding:20px;max-height:90vh;overflow:auto}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}.shake{animation:shake .3s 3}
+@keyframes glitch{0%{opacity:1}50%{opacity:.6;transform:translateX(2px)}100%{opacity:1}}.glitch{animation:glitch .2s infinite}
+body.clean-vault{background:#050805!important}body.clean-vault canvas{display:none!important}
+.meter{height:10px;background:#0a2a0a;border:1px solid #00ff41;border-radius:20px;overflow:hidden}.meter div{height:100%;background:#00ff41;width:0%}
+.big-add{background:#ffcc00!important;font-size:18px!important;padding:16px!important;box-shadow:0 0 25px rgba(255,204,0,.5)}
+#status{font-weight:900;color:#ffcc00;text-align:center;margin:10px 0;min-height:22px}
+</style></head>
+<body><canvas id="c"></canvas>
+<div id="hackScreen" class="screen"><div class="term"><div style="font-size:24px;font-weight:900" class="glitch">⚠️ SECURE SERVER // BHAI'S VAULT</div><div style="color:#ffcc00">TARGET: 192.168.1.1 | STATUS: HACKING...</div><div id="logs" style="margin-top:12px"></div><div class="bar"><div id="fill" class="fill"></div></div><div id="pct" style="text-align:right">0%</div><div style="font-size:12px;color:#888">> Agar tu authorized nahi hai toh abhi back jaa...</div></div></div>
+<div id="lockScreen" class="screen hidden"><div class="box" id="lockBox"><div style="font-size:52px">🔒</div><h1 style="margin:6px 0">SECURE VAULT</h1><p style="color:#ffcc00">AUTHORIZED ACCESS ONLY<br>⚠️ 3 baar galat password = 10 sec LOCK</p><input id="pass" type="password" placeholder="Password daalo..."><button onclick="unlock()">🔓 UNLOCK VAULT</button><button class="ghost" onclick="togglePass()">👁️ Password Dekho / Chupao</button><p id="msg"></p><p style="font-size:12px;color:#888">Password: <b style="color:#fff">7744</b><br>Vault ke andar se badal sakta hai</p></div></div>
+<div id="vaultScreen" class="hidden"><div class="vault"><div class="top"><h2 style="margin:0">📁 BHAI'S VAULT <span style="font-size:12px;color:#ffcc00">● ENCRYPTED • AES-256 • V8 - WEB</span></h2><div style="display:flex;gap:8px"><button onclick="openWeb()" style="width:auto;background:#00aaff;color:#fff">🌐 WEB BROWSER</button><button onclick="logout()" style="width:auto;background:#ff2d2d;color:#fff">🔒 Lock Karo</button></div></div>
+<p style="color:#9dffb5">Storage: <span id="storeTxt">0 MB used</span></p><div class="meter"><div id="meterFill"></div></div>
+
+<div id="webSection" class="hidden" style="margin-top:16px;border:2px solid #00aaff;border-radius:14px;padding:12px;background:#010a12">
+<h3 style="margin:0;color:#00aaff">🌐 VAULT BROWSER - Vault ke andar hi Web</h3>
+<p style="font-size:12px;color:#9dffb5">Yaha se web chalao, vault se bahar jaane ki zaroorat nahi. Kuch sites (Instagram / WhatsApp) iframe block karti hai, wo niche wale button se khulengi.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="webUrl" value="https://www.google.com" placeholder="Site likho - jaise https://youtube.com" style="flex:1;min-width:180px;border-color:#00aaff;color:#fff"><button onclick="goWeb()" style="width:auto;background:#00aaff">GO ▶️</button><button onclick="closeWeb()" style="width:auto" class="ghost">Band Karo</button></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+<button onclick="openSite('https://www.google.com')" style="width:auto;background:#fff;color:#000">🔍 Google</button>
+<button onclick="openSite('https://www.youtube.com')" style="width:auto;background:#ff0000">▶️ YouTube</button>
+<button onclick="openSite('https://www.wikipedia.org')" style="width:auto;background:#fff;color:#000">📖 Wikipedia</button>
+<button onclick="openSite('https://duckduckgo.com')" style="width:auto;background:#ff6600">🦆 DuckDuckGo</button>
+<button onclick="openSite('https://web.whatsapp.com')" style="width:auto;background:#25D366">💬 WhatsApp Web</button>
+<button onclick="openSite('https://www.instagram.com')" style="width:auto;background:#E1306C">📸 Instagram</button>
+</div>
+<div style="margin-top:12px;border:1px solid #00aaff;border-radius:10px;overflow:hidden;background:#fff">
+<iframe id="webFrame" src="https://www.google.com" style="width:100%;height:520px;border:none;background:#fff"></iframe>
+</div>
+<p id="webNote" style="font-size:12px;color:#ffcc00">Tip: Agar site blank dikhe toh uska matlab us site ne iframe block kiya hai. Tab us button pe dobara tap karo, wo naye tab me khul jayegi.</p>
+</div>
+<button class="big-add" onclick="document.getElementById('realFile').click()">📂 PHONE SE FILE CHUNO - 200MB TAK</button>
+<input type="file" id="realFile" style="display:none" onchange="handleRealFile(event)">
+<div id="status"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><input id="search" oninput="render()" placeholder="🔍 File dhoondo..." style="flex:1;min-width:180px"><select id="filter" onchange="render()" style="max-width:180px"><option value="">Sab Types</option><option>Photo</option><option>Video</option><option>Document</option><option>File</option></select><button onclick="changePass()" style="width:auto;background:#ffcc00">🔑 PASSWORD BADLO</button></div>
+<div class="grid" id="grid"></div>
+<div id="empty" style="text-align:center;color:#888;margin-top:30px">Vault khaali hai. Upar PEELA button se apni file chuno.</div>
+<p style="font-size:12px;color:#888;text-align:center;margin-top:24px">Data isi Chrome / Phone me save hota hai • Badi file ke liye IndexedDB use ho raha hai</p></div></div>
+<div id="viewModal" class="modal hidden"><div class="modalBox"><div id="viewContent"></div><button class="ghost" onclick="closeView()">Band Karo</button></div></div>
+<script>
+var cv=document.getElementById('c'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;var drops=Array(Math.floor(cv.width/16)).fill(1);
+var matrixTimer=setInterval(function(){ctx.fillStyle='rgba(0,0,0,0.08)';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#00ff41';ctx.font='14px monospace';drops.forEach(function(y,i){ctx.fillText(String.fromCharCode(33+Math.random()*90),i*16,y*16);drops[i]=y*16>cv.height&&Math.random()>0.975?0:y+1})},50);
+var logs=["> ACCESSING SECURE SERVER... OK","> BYPASSING FIREWALL... DONE","> ENCRYPTION: AES-256 ACTIVE","> INTRUSION DETECTED... TRACE BLOCKED","> IP HIDDEN: 0.0.0.0","> VAULT FOUND: BHAI'S STORAGE","> LOADING LOCK SCREEN..."];
+var li=0,prog=0;var int=setInterval(function(){if(li<logs.length)document.getElementById('logs').innerHTML+='<div>'+logs[li++]+'</div>';prog+=13;if(prog>100)prog=100;document.getElementById('fill').style.width=prog+'%';document.getElementById('pct').innerText=prog+'%';if(prog>=100){clearInterval(int);setTimeout(function(){document.getElementById('hackScreen').classList.add('hidden');document.getElementById('lockScreen').classList.remove('hidden')},600)}},480);
+var wrong=0;function getPass(){return localStorage.getItem('bhai_pass_v8')||'7744'}
+function togglePass(){var p=document.getElementById('pass');p.type=p.type==='password'?'text':'password'}
+function unlock(){var v=document.getElementById('pass').value,m=document.getElementById('msg');if(v===getPass()){m.innerHTML='<span style="color:#00ff41">✅ ACCESS GRANTED... VAULT KHUL RAHA HAI</span>';setTimeout(function(){document.body.classList.add('clean-vault');document.getElementById('c').style.display='none';try{clearInterval(matrixTimer)}catch(e){}document.getElementById('lockScreen').classList.add('hidden');document.getElementById('vaultScreen').classList.remove('hidden');loadFiles()},800)}else{wrong++;var b=document.getElementById('lockBox');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');m.innerHTML='<span style="color:#ff2d2d">❌ ACCESS DENIED - GALAT PASSWORD ('+wrong+'/3)</span>';if(wrong>=3){document.getElementById('pass').disabled=true;setTimeout(function(){wrong=0;document.getElementById('pass').disabled=false;m.innerHTML=''},10000)}}}
+function changePass(){var np=prompt('Naya password daalo:');if(np){localStorage.setItem('bhai_pass_v8',np);alert('✅ Password badal gaya! Naya: '+np)}}
+function logout(){location.reload()}
+function closeView(){document.getElementById('viewModal').classList.add('hidden')}
+var files=[],db=null;
+var dbReq=indexedDB.open('bhai_vault_v8',1);
+dbReq.onupgradeneeded=function(e){var d=e.target.result;if(!d.objectStoreNames.contains('files'))d.createObjectStore('files',{keyPath:'id',autoIncrement:true})};
+dbReq.onsuccess=function(e){db=e.target.result};
+function loadFiles(){if(!db){setTimeout(loadFiles,400);return}var tx=db.transaction('files','readonly');var req=tx.objectStore('files').getAll();req.onsuccess=function(){files=req.result||[];render()}}
+function render(){var q=(document.getElementById('search').value||'').toLowerCase(),f=document.getElementById('filter').value,g=document.getElementById('grid');g.innerHTML='';var list=files.filter(function(x){return x.name.toLowerCase().includes(q)&&(!f||x.type.includes(f)||(f==='Photo'&&x.mime&&x.mime.indexOf('image')===0)||(f==='Video'&&x.mime&&x.mime.indexOf('video')===0))});document.getElementById('empty').style.display=list.length?'none':'block';var total=0;files.forEach(function(x){total+=x.sizeBytes||0});document.getElementById('storeTxt').innerText=(total/1024/1024).toFixed(1)+' MB used';document.getElementById('meterFill').style.width=Math.min(100,total/1024/1024/2)+'%';list.forEach(function(file){var d=document.createElement('div');d.className='card';var thumb=file.mime&&file.mime.indexOf('image')===0?'<img src="'+URL.createObjectURL(file.blob)+'" style="width:100%;height:120px;object-fit:cover;border-radius:10px">':'<div style="font-size:38px">'+file.type+'</div>';d.innerHTML=thumb+'<b>'+file.name+'</b><small>'+file.type+' • '+file.size+'</small><br><small>'+(file.note||'Asli file')+'</small><br><span class="chip">🔒 ENCRYPTED</span><br><button onclick="event.stopPropagation();delFile('+file.id+')" style="background:#ff2d2d;color:#fff;padding:7px">Delete</button>';d.onclick=function(){var preview='';if(file.mime&&file.mime.indexOf('image')===0)preview='<img src="'+URL.createObjectURL(file.blob)+'" style="width:100%;border-radius:10px;margin:10px 0">';else if(file.mime&&file.mime.indexOf('video')===0)preview='<video src="'+URL.createObjectURL(file.blob)+'" controls style="width:100%;border-radius:10px;margin:10px 0"></video>';else preview='<a href="'+URL.createObjectURL(file.blob)+'" download="'+file.name+'" style="display:block;background:#00ff41;color:#000;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:900;margin:10px 0">⬇️ FILE DOWNLOAD / KHOLO</a>';document.getElementById('viewContent').innerHTML='<div style="font-size:40px">'+file.type+'</div><h2>'+file.name+'</h2><p>'+file.type+' • '+file.size+'</p>'+preview+'<p style="background:#000;padding:12px;border:1px solid #00ff41">'+(file.note||'Asli file')+'</p><p style="color:#ffcc00">🔒 Ye file encrypted hai</p>';document.getElementById('viewModal').classList.remove('hidden')};g.appendChild(d)})}
+function delFile(id){if(confirm('Delete kar du?')){var tx=db.transaction('files','readwrite');tx.objectStore('files').delete(id);tx.oncomplete=function(){loadFiles()}}}
+function handleRealFile(e){var f=e.target.files[0];e.target.value='';if(!f)return;if(!db){document.getElementById('status').innerText='DB load ho raha hai, 1 sec baad dobara try karo';return}if(f.size>200*1024*1024){document.getElementById('status').innerText='⚠️ 200MB se badi file mat daalo';return}document.getElementById('status').innerText='⏳ Save ho rahi hai: '+f.name+' ('+(f.size/1024/1024).toFixed(1)+' MB)...';var tx=db.transaction('files','readwrite');var obj={name:f.name,type:f.type.indexOf('image')===0?'📷 Photo':f.type.indexOf('video')===0?'🎬 Video':f.type.indexOf('pdf')>=0?'📄 Document':'📁 File',size:(f.size/1024/1024).toFixed(1)+' MB',sizeBytes:f.size,mime:f.type,note:'Asli file - phone se chuni',blob:f};var req=tx.objectStore('files').add(obj);req.onsuccess=function(){document.getElementById('status').innerText='✅ HO GAYA! '+f.name+' VAULT ME ADD HO GAYI! 👇';loadFiles();setTimeout(function(){document.getElementById('status').innerText=''},4000)};req.onerror=function(){document.getElementById('status').innerText='❌ Save nahi hui, storage full hai'}}
+
+function openWeb(){document.getElementById('webSection').classList.remove('hidden');document.getElementById('webSection').scrollIntoView({behavior:'smooth'});}
+function closeWeb(){document.getElementById('webSection').classList.add('hidden');}
+function goWeb(){var u=document.getElementById('webUrl').value.trim();if(!u)return;if(!u.startsWith('http'))u='https://'+u;document.getElementById('webUrl').value=u;document.getElementById('webFrame').src=u;}
+function openSite(url){document.getElementById('webUrl').value=url;openWeb();var f=document.getElementById('webFrame');f.src=url;setTimeout(function(){try{var doc=f.contentDocument;if(!doc||!doc.body||doc.body.innerHTML==''){}}catch(e){}},2000);}
+// Quick: if iframe blocked, double tap opens new tab
+document.addEventListener('DOMContentLoaded',function(){var f=document.getElementById('webFrame');if(f){f.addEventListener('dblclick',function(){window.open(document.getElementById('webUrl').value,'_blank')})}});
+
+document.getElementById('pass').addEventListener('keydown',function(e){if(e.key==='Enter')unlock()});
+</script></body></html>
